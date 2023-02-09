@@ -1,4 +1,5 @@
 // import { solve } from 'sat-solver';
+import { init } from 'z3-solver';
 import tritypeCfg from "./Tritype.json";
 
 const { solve } = require('sat-solver')
@@ -24,6 +25,17 @@ export class Worker {
 
         solve(constraintsIndex);
     } 
+
+    private z3Solver = async (constraints: number[]) => {
+        const z3 = await init();
+        const { Solver, Int, And } = z3.Context('main');
+        const solver = new Solver();
+        const expression = Int.consts(constraints.map(c => c.toString()));
+
+        // TODO - Add High Level expression validation
+
+        return await solver.check();
+    }
 
     private addYVars = (constraints: { tab: number[], min: number[], i: number }) => {
         const y: {[constraint: string]: boolean} = {};
